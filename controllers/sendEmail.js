@@ -1,6 +1,7 @@
 const nodemailer = require("nodemailer");
+const sgMail = require("@sendgrid/mail");
 
-const sendEmail = async (req, res) => {
+const sendEmailEthereal = async (req, res) => {
     let testAccount = await nodemailer.createTestAccount(); 
     // this is going to create a test account for us i.e a fake email account
     // we do this because we don't want to send emails to real people i.e just for testing purpose here
@@ -26,7 +27,24 @@ const sendEmail = async (req, res) => {
     res.json(emailinfo); // used to send the response back to the client
 }
 
-module.exports = sendEmail;
+
+// use SendGrid to send email (used in actual production)
+// nodemailer is not used in this case as it is not a transport service rather it is a library that is used to send emails 
+const sendEmailSendgrid = async (req, res) => {
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    
+    const msg = {
+      to: 'krishnaraj3993@gmail.com', // Change to your recipient
+      from: 'adhikarisaurav3993@gmail.com', // Change to your verified sender
+      subject: 'Sending message with SendGrid',
+      text: 'hello ! this is a test email', // use for plain text body only
+      html: '<b> Hello! this is a test email </b>', // use for html text
+    };
+    const emailinfo = await sgMail.send(msg);
+    res.json(emailinfo);
+};
+
+module.exports = sendEmailSendgrid;
 
 
  // We are going to use a transport service Ethereal that nodemailer is going to use to send the email 
